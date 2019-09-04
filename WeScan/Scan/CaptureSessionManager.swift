@@ -11,7 +11,7 @@ import CoreMotion
 import AVFoundation
 
 /// A set of functions that inform the delegate object of the state of the detection.
-protocol RectangleDetectionDelegateProtocol: NSObjectProtocol {
+public protocol RectangleDetectionDelegateProtocol: NSObjectProtocol {
     
     /// Called when the capture of a picture has started.
     ///
@@ -42,12 +42,13 @@ protocol RectangleDetectionDelegateProtocol: NSObjectProtocol {
 }
 
 /// The CaptureSessionManager is responsible for setting up and managing the AVCaptureSession and the functions related to capturing.
-final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
-    
+public final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
+
+    public weak var delegate: RectangleDetectionDelegateProtocol?
+
     private let videoPreviewLayer: AVCaptureVideoPreviewLayer
     private let captureSession = AVCaptureSession()
     private let rectangleFunnel = RectangleFeaturesFunnel()
-    weak var delegate: RectangleDetectionDelegateProtocol?
     private var displayedRectangleResult: RectangleDetectorResult?
     private var photoOutput = AVCapturePhotoOutput()
     
@@ -62,7 +63,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
     
     // MARK: Life Cycle
     
-    init?(videoPreviewLayer: AVCaptureVideoPreviewLayer) {
+    public init?(videoPreviewLayer: AVCaptureVideoPreviewLayer) {
         self.videoPreviewLayer = videoPreviewLayer
         super.init()
         
@@ -117,7 +118,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: Capture Session Life Cycle
     
     /// Starts the camera and detecting quadrilaterals.
-    internal func start() {
+    public func start() {
         let authorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         
         switch authorizationStatus {
@@ -138,7 +139,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
         }
     }
     
-    internal func stop() {
+    public func stop() {
         captureSession.stopRunning()
     }
     
@@ -157,7 +158,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
     
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
     
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+    public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard isDetecting == true,
             let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
@@ -236,7 +237,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
 extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
     
-    func photoOutput(_ captureOutput: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
+    public func photoOutput(_ captureOutput: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
         if let error = error {
             delegate?.captureSessionManager(self, didFailWithError: error)
             return
@@ -258,7 +259,7 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
     }
     
     @available(iOS 11.0, *)
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+    public func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
             delegate?.captureSessionManager(self, didFailWithError: error)
             return
