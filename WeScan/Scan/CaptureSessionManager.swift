@@ -143,7 +143,7 @@ public final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSamp
         captureSession.stopRunning()
     }
     
-    internal func capturePhoto() {
+    public func capturePhoto() {
         guard let connection = photoOutput.connection(with: .video), connection.isEnabled, connection.isActive else {
             let error = ImageScannerControllerError.capture
             delegate?.captureSessionManager(self, didFailWithError: error)
