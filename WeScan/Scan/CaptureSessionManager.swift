@@ -198,18 +198,21 @@ public final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSamp
 
                 switch result {
                 case .showAndAutoScan:
-                    delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: 1)
+                    DispatchQueue.main.async {
+                        strongSelf.delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: 1)
+                    }
+
                     if CaptureSession.current.isAutoScanEnabled, !CaptureSession.current.isEditing {
                         capturePhoto()
                     }
                 case .showOnly(let autoScanProgress):
-                    delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: autoScanProgress)
+                    DispatchQueue.main.async {
+                        strongSelf.delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: autoScanProgress)
+                    }
                 }
             }
 
         } else {
-            delegate?.captureSessionManager(self, didUpdateAutoScanProgress: 0)
-
             DispatchQueue.main.async { [weak self] in
                 guard let strongSelf = self else {
                     return
@@ -219,6 +222,7 @@ public final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSamp
                 if strongSelf.noRectangleCount > strongSelf.noRectangleThreshold {
                     // Reset the currentAutoScanPassCount, so the threshold is restarted the next time a rectangle is found
                     strongSelf.rectangleFunnel.currentAutoScanPassCount = 0
+                    strongSelf.delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: 0)
 
                     // Remove the currently displayed rectangle as no rectangles are being found anymore
                     strongSelf.displayedRectangleResult = nil
