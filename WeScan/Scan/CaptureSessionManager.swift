@@ -198,7 +198,7 @@ public final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSamp
 
                 switch result {
                 case .showAndAutoScan:
-                    delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: 0)
+                    delegate?.captureSessionManager(strongSelf, didUpdateAutoScanProgress: 1)
                     if CaptureSession.current.isAutoScanEnabled, !CaptureSession.current.isEditing {
                         capturePhoto()
                     }
@@ -208,6 +208,7 @@ public final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSamp
             }
 
         } else {
+            delegate?.captureSessionManager(self, didUpdateAutoScanProgress: 0)
 
             DispatchQueue.main.async { [weak self] in
                 guard let strongSelf = self else {

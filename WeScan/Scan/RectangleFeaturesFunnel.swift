@@ -102,6 +102,8 @@ final class RectangleFeaturesFunnel {
             return
         }
 
+        let autoscanProgress = Float(currentAutoScanPassCount) / Float(autoScanThreshold)
+
         if let previousRectangle = currentRectangle,
             bestRectangle.rectangleFeature.isWithin(autoScanMatchingThreshold, ofRectangleFeature: previousRectangle) {
             currentAutoScanPassCount += 1
@@ -109,11 +111,10 @@ final class RectangleFeaturesFunnel {
                 currentAutoScanPassCount = 0
                 completion(AddResult.showAndAutoScan, bestRectangle.rectangleFeature)
             } else {
-                let autoscanProgress = Float(currentAutoScanPassCount) / Float(autoScanThreshold)
                 completion(AddResult.showOnly(autoscanProgress), bestRectangle.rectangleFeature)
             }
         } else {
-            completion(AddResult.showOnly(0), bestRectangle.rectangleFeature)
+            completion(AddResult.showOnly(autoscanProgress), bestRectangle.rectangleFeature)
         }
     }
 
